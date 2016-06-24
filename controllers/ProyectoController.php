@@ -626,7 +626,7 @@ class ProyectoController extends Controller
         $proyecto->archivo2 = UploadedFile::getInstance($proyecto, 'archivo2');
         if($proyecto->archivo2) {
             
-            $proyecto->proyecto_archivo2=$proyecto->id. '_2.' . $proyecto->archivo2->extension;
+            $proyecto->proyecto_archivo2=$proyecto->id. '.' . $proyecto->archivo2->extension;
             $proyecto->formato_proyecto2=1;//formato en documento
             $proyecto->update();
             $proyecto->archivo2->saveAs('proyectos/' . $proyecto->proyecto_archivo2);
