@@ -178,6 +178,11 @@ class ProyectoController extends Controller
         $proyectoexiste=ProyectoCopia::find()->where('id=:id and etapa=1',[':id'=>$proyecto->id])->one();
         if(!$proyectoexiste)
         {
+            $proyectoetapa=Proyecto::findOne($proyecto->id);
+            $equipo=Equipo::findOne($proyectoetapa->equipo_id);
+            $equipo->etapa=1;
+            $equipo->update();
+            
             $proyectocopia =    'insert into proyecto_copia (id,titulo,resumen,objetivo_general,beneficiario,user_id,asunto_id,equipo_id,etapa,proyecto_archivo,formato_proyecto)
                                 select id,titulo,resumen,objetivo_general,beneficiario,user_id,asunto_id,equipo_id,1,proyecto_archivo,formato_proyecto from proyecto
                                 where id='.$proyecto->id.'  ';
@@ -220,6 +225,13 @@ class ProyectoController extends Controller
                                 where proyecto_id='.$proyecto->id.' and etapa=0 ';
             \Yii::$app->db->createCommand($videocopia)->execute();
             
+            $foro =    'insert into foro (titulo,descripcion,user_id,post_count,proyecto_id)
+                                select proyecto.titulo,proyecto.resumen,1,0,proyecto.id from proyecto
+                                inner join equipo on equipo.id=proyecto.equipo_id
+                                where equipo.etapa=1 and proyecto.id='.$proyecto->id.' ';
+            \Yii::$app->db->createCommand($foro)->execute();
+            
+            
             
             $usuario=Usuario::findOne(\Yii::$app->user->id);
             $integrante=Integrante::find()->where('estudiante_id=:estudiante_id',[':estudiante_id'=>$usuario->estudiante_id])->one();
@@ -239,7 +251,7 @@ class ProyectoController extends Controller
             
             $proyectoetapa=Proyecto::findOne($proyecto->id);
             $equipo=Equipo::findOne($proyectoetapa->equipo_id);
-            $equipo->etapa=$etapa->etapa;
+            $equipo->etapa=1;
             $equipo->update();
             
             echo 1;
