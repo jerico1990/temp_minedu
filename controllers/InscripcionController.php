@@ -132,9 +132,16 @@ class InscripcionController extends Controller
                         $invitacion->estudiante_id=$institucion->estudiante_id;
                         $invitacion->equipo_id=$equipo->id;
                         $invitacion->estudiante_invitado_id=$equipo->invitaciones[$i];
-                        $invitacion->estado=1;
+                        $invitacion->estado=2;
                         $invitacion->fecha_invitacion=date("Y-m-d H:i:s");
                         $invitacion->save();
+                        
+                        $integrante_new=new Integrante();
+                        $integrante_new->equipo_id=$equipo->id;
+                        $integrante_new->estudiante_id=$equipo->invitaciones[$i];
+                        $integrante_new->rol=2;
+                        $integrante_new->estado=1;
+                        $integrante_new->save();
                     }
                 }
             }
@@ -154,9 +161,16 @@ class InscripcionController extends Controller
                         $invitacion->estudiante_id=$institucion->estudiante_id;
                         $invitacion->equipo_id=$equipo->id;
                         $invitacion->estudiante_invitado_id=$equipo->invitaciones_docente[$i];
-                        $invitacion->estado=1;
+                        $invitacion->estado=2;
                         $invitacion->fecha_invitacion=date("Y-m-d H:i:s");
                         $invitacion->save();
+                        
+                        $integrante_new=new Integrante();
+                        $integrante_new->equipo_id=$equipo->id;
+                        $integrante_new->estudiante_id=$equipo->invitaciones_docente[$i];
+                        $integrante_new->rol=2;
+                        $integrante_new->estado=1;
+                        $integrante_new->save();
                     }
                 }
             }
@@ -281,9 +295,16 @@ class InscripcionController extends Controller
                     $invitacion->estudiante_id=$institucion->estudiante_id;
                     $invitacion->equipo_id=$equipo->id;
                     $invitacion->estudiante_invitado_id=$equipo->invitaciones[$i];
-                    $invitacion->estado=1;
+                    $invitacion->estado=2;
                     $invitacion->fecha_invitacion=date("Y-m-d H:i:s");
                     $invitacion->save();
+                    
+                    $integrante_new=new Integrante();
+                    $integrante_new->equipo_id=$equipo->id;
+                    $integrante_new->estudiante_id=$equipo->invitaciones[$i];
+                    $integrante_new->rol=2;
+                    $integrante_new->estado=1;
+                    $integrante_new->save();
                 }
             }
             
@@ -296,9 +317,16 @@ class InscripcionController extends Controller
                     $invitacion->estudiante_id=$institucion->estudiante_id;
                     $invitacion->equipo_id=$equipo->id;
                     $invitacion->estudiante_invitado_id=$equipo->invitaciones_docente[$i];
-                    $invitacion->estado=1;
+                    $invitacion->estado=2;
                     $invitacion->fecha_invitacion=date("Y-m-d H:i:s");
                     $invitacion->save();
+                    
+                    $integrante_new=new Integrante();
+                    $integrante_new->equipo_id=$equipo->id;
+                    $integrante_new->estudiante_id=$equipo->invitaciones_docente[$i];
+                    $integrante_new->rol=2;
+                    $integrante_new->estado=1;
+                    $integrante_new->save();
                 }
             }
             
