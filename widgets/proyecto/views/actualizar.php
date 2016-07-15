@@ -105,7 +105,7 @@ label{
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group label-floating field-proyecto-titulo required">
                                 <label class="control-label" for="proyecto-titulo">Título del proyecto</label>
-                                <input type="text" id="proyecto-titulo" class="form-control" name="Proyecto[titulo]" maxlength="200" title="Máximo 200 palabras" value="<?= $proyecto->titulo ?>" disabled <?php //= $disabled ?>>
+                                <input type="text" id="proyecto-titulo" class="form-control" name="Proyecto[titulo]" maxlength="200" title="Máximo 200 palabras" value="<?= $proyecto->titulo ?>" <?php //= $disabled ?>>
                             </div>
                         </div>
                         <div class="clearfix"></div>
