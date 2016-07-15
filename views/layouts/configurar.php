@@ -17,19 +17,27 @@ use app\models\Estudiante;
 use app\models\Invitacion;
 AppEstandarAsset::register($this);
 if (!\Yii::$app->user->isGuest) {
+$msg="No te olvides de hacer tu video de la primera actividad y aportar en los proyectos de tus compañeros.";
 $etapa2=Etapa::find()->where('etapa=2')->one();
 $etapa3=Etapa::find()->where('etapa=3')->one();
 $usuario=Usuario::find()->where('id=:id',[':id'=>\Yii::$app->user->id])->one();
 $estudiante=Estudiante::find()->where('id=:id',[':id'=>$usuario->estudiante_id])->one();
-//$invitacion=Invitacion::find()->where('equipo_id=:equipo_id and estado=1',[':equipo_id'=>$equipo->id])->one();
 $integrante=Integrante::find()->where('estudiante_id=:estudiante_id',[':estudiante_id'=>$usuario->estudiante_id])->one();
 if($integrante)
 {
     $equipo=Equipo::find()->where('id=:id and estado=1',[':id'=>$integrante->equipo_id])->one();
     if($equipo)
     {
-        
         $proyecto=Proyecto::find()->where('equipo_id=:equipo_id',[':equipo_id'=>$equipo->id])->one();
+    }
+    
+    if($equipo && ($equipo->etapa==0 or $equipo->etapa==NULL))
+    {
+        $msg="Gracias por tu esfuerzo, te invitamos a participar de los foros y seguir poniendo tus ideas en acción.";
+    }
+    elseif($equipo && $equipo->etapa==1)
+    {
+        $msg="No te olvides de hacer tu video de la primera actividad y aportar en los proyectos de tus compañeros.";
     }
 }
 $foros=Foro::find()->orderBy('id DESC')->all();
@@ -105,7 +113,7 @@ if($key==4)
             <tbody>
                 <tr>
                     <td>
-                        No olvides dejar tus comentarios. <br>Es requisito para seguir en el concurso.
+                        <?= $msg ?>
                     </td>
                 </tr>
             </tbody>
@@ -288,7 +296,7 @@ if($key==4)
                                                         Votación interna <span class="hide">></span>
                                                     </div>
                                                 </div>
-                                            </div>',['proyecto/votacion'],[]);?>
+                                            </div>',['proyecto/votacion'],['style'=>'background:#f6de34;color:#1f2a69 !important']);?>
                                         </li>
                                         <?php }?>
                                         
@@ -296,15 +304,15 @@ if($key==4)
                                 </ul>
                             </div>
     
-                            <a href="#" data-toggle="modal" data-target="#myModalVideo" class="btn btn-default btn-lateral">
-                                <span class="icon_play"> Video de etapas del concurso</span>
+                            <a href="#" data-toggle="modal" data-target="#myModalVideo" class="btn btn-default btn-lateral" style="line-height:20px !important">
+                                <span class="icon_play"> Video tutorial para hacer <br>proyectos</span>
                             </a>
     
                             <a href="<?= \Yii::$app->request->BaseUrl ?>/guia_final.pdf" target="_blank" class="btn btn-default btn-lateral">
-                                <span class="icon_download"> GUÍA DE ORIENTACIÓN</span>
+                                <span class="icon_download"> GUÍA DE PROYECTO</span>
                             </a>
                             <a href="<?= \Yii::$app->request->BaseUrl ?>/esquema_rapido_del_proyecto.pdf" target="_blank" class="btn btn-default btn-lateral">
-                                <span class="icon_download"> ESQUEMA DE PROYECTO</span>
+                                <span class="icon_download"> Formato 2da entrega</span>
                             </a>
                             <!--
                             <a href="#" class="btn btn-default btn-lateral">
@@ -425,7 +433,8 @@ if($key==4)
         <div class="modal-content">
             <div class="modal-body ">
                 <div class="embed-responsive embed-responsive-16by9">
-                    <iframe width="492" height="277" src="https://www.youtube.com/embed/qjS7HMqyfcg" frameborder="0" allowfullscreen></iframe>
+                    <!--<iframe width="492" height="277" src="https://www.youtube.com/embed/qjS7HMqyfcg" frameborder="0" allowfullscreen></iframe>-->
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/oKzLuHSvCYU" frameborder="0" allowfullscreen></iframe>
                 </div>
                 
             </div>

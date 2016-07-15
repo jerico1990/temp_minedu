@@ -179,8 +179,11 @@ $foros=Foro::find()->orderBy('id DESC')->all();
                                         <?= Html::a("Reporte de segunda entrega",['#'],['class'=>'sub_menu']);?>
                                         <ul>
                                             <li><?= Html::a("Reportes de aportes de proyectos",['proyecto/buscar-monitor'],[]);?></li>
-                                            
+                                            <li><?= Html::a("Reportes de proyectos",['reporte/proyecto2entrega'],[]);?></li>
                                         </ul>
+                                    </li>
+                                    <li>
+                                        <?= Html::a("Evaluación de proyectos",['panel/votacioninterna']);?>
                                     </li>
                                     <?php /*
                                     <li>

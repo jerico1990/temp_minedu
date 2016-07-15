@@ -311,6 +311,81 @@ class ReporteController extends Controller
         ]);
     }
     
+    public function actionProyecto2entrega()
+    {
+        $this->layout='administrador';
+        
+        $sort = new Sort([
+            'attributes' => [
+                /*'department' => [
+                    'label' => 'Región',
+                ],*/
+            ],
+        ]);
+        
+        $model = new Proyecto();
+        $model->load(Yii::$app->request->queryParams);
+        return $this->render('proyecto2entrega', [
+            'model' => $model,
+            'sort' => $sort,
+        ]);
+    }
+    
+    public function actionProyecto2entregaDescargar($region=null)
+    {
+        $this->layout='administrador';
+        
+        if($region)
+        {
+            $proyectos=Proyecto::find()->select('
+                    u.department,
+                    ins.codigo_modular,
+                    ins.denominacion,
+                    es.nombres,
+                    es.apellido_paterno,
+                    es.apellido_materno,
+                    es.email,
+                    es.celular,
+                    es.grado,
+                    proyecto.titulo,
+                    e.descripcion_equipo
+                  ')
+            ->innerJoin('equipo e','e.id = proyecto.equipo_id')
+            ->innerJoin('integrante i','i.equipo_id = e.id')
+            ->innerJoin('estudiante es','es.id=i.estudiante_id')
+            ->innerJoin('institucion ins','ins.id=es.institucion_id')
+            ->innerJoin('ubigeo u','u.district_id=ins.ubigeo_id')
+            ->where('u.department_id=:department_id and e.etapa=2',[':department_id'=>$region])
+            ->all();
+        }
+        else{
+            $proyectos=Proyecto::find()->select('
+                    u.department,
+                    ins.codigo_modular,
+                    ins.denominacion,
+                    es.nombres,
+                    es.apellido_paterno,
+                    es.apellido_materno,
+                    es.email,
+                    es.celular,
+                    es.grado,
+                    proyecto.titulo,
+                    e.descripcion_equipo
+                  ')
+            ->innerJoin('equipo e','e.id = proyecto.equipo_id')
+            ->innerJoin('integrante i','i.equipo_id = e.id')
+            ->innerJoin('estudiante es','es.id=i.estudiante_id')
+            ->innerJoin('institucion ins','ins.id=es.institucion_id')
+            ->innerJoin('ubigeo u','u.district_id=ins.ubigeo_id')
+            ->where('e.etapa=2')
+            ->all();
+        }
+        
+        return $this->render('proyecto2entrega-descargar', [
+            'proyectos' => $proyectos,
+        ]);
+    }
+    
     public function actionProyectoDescargar($region=null)
     {
         if($region)

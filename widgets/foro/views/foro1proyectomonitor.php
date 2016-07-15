@@ -16,6 +16,9 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
 <link href="<?= \Yii::$app->request->BaseUrl ?>/ratings/dist/themes/fontawesome-stars.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script src="<?= \Yii::$app->request->BaseUrl ?>/ratings/dist/jquery.barrating.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.webui-popover/1.2.1/jquery.webui-popover.min.css">
+
+    <script src="https://cdn.jsdelivr.net/jquery.webui-popover/1.2.1/jquery.webui-popover.min.js"></script>
 <style>
     .pagination>li:first-child>a, .pagination>li:first-child>span
     {
@@ -81,9 +84,9 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
     ]); ?>
     <div class="md-col-6">
         <div class="form-group label-floating field-voto-region">
-            <label>Sección (Selecciona una sección para comentar el proyecto)</label>
-            <select id="proyecto-seccion" name="Proyecto[seccion]" class="form-control" >
-                <option value></option>
+            <label>Sección</label>
+            <select style="border: 2px solid #1f2a69;padding: 10px;margin-top: 10px;margin-bottom: 3px;background: #F0EFF1" id="proyecto-seccion" name="Proyecto[seccion]" class="form-control" >
+                <option value>Selecciona una sección para comentar el proyecto</option>
                 <option value="1" <?= ($seccion==1)?'selected':'' ?>>Nombre del proyecto</option>
                 <option value="2" <?= ($seccion==2)?'selected':'' ?>>Resumen del proyecto</option>
                 <option value="3" <?= ($seccion==3)?'selected':'' ?>>Beneficiarios</option>
@@ -168,7 +171,7 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
                 data: {id:"<?= $model->id ?>",seccion:$("#proyecto-seccion").val()},
                 dataType : "html",
                 success: function(data){
-                    
+                   
                     $('#comentarios').append(data);
                     $('.disabled').barrating({
                         theme: 'fontawesome-stars',
@@ -178,8 +181,9 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
                     
                     $('.enable').barrating({
                         theme: 'fontawesome-stars',
-                        
                       });
+                    $('.popover1').webuiPopover();
+                    
                 }
             });
 	});
@@ -265,27 +269,6 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
         
         $( '#btncomentarhijo' ).click(function( event ) {
             var error="";
-            /*if (jQuery.trim($("#foro_comentario-contenido_hijo").val())=='') {
-                error=error+"No ha comentado <br>"                
-            }
-            console.log("cesar");
-            if (error!="") {
-                /*$.notify({
-                        // options
-                        message: error
-                    },{
-                        // settings
-                        type: 'danger',
-                        z_index: 1000000,
-                        placement: {
-                                from: 'bottom',
-                                align: 'right'
-                        },
-                    });
-                return false;
-            }
-            else
-            {*/
                 $.ajax({
                     url: '<?= $insertarcomentarioshijos ?>',
                     type: 'POST',
@@ -326,8 +309,20 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
                     }
                 });
                 return true;
-            //}
         });
+        
+        function Rating(rating,id) {
+            console.log("1");
+            $.ajax({
+                url: '<?= $rating ?>',
+                type: 'GET',
+                async: true,
+                data: {rating:rating,comentario_id:id},
+                success: function(data){
+                    
+                }
+            });
+        }
     });
     
     function Responder(value) {
@@ -342,7 +337,7 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
     });
     
     function Rating(rating,id) {
-        
+        console.log("2");
         $.ajax({
             url: '<?= $rating ?>',
             type: 'GET',

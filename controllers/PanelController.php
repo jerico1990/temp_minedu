@@ -65,6 +65,10 @@ class PanelController extends Controller
     public function actionIdeasAccion()
     {
         $this->layout='ideas';
+        $msg=           "Felicitaciones por tu esfuerzo.<br>
+                        Si bien no pasaste a la siguiente etapa,<br>
+                        te invitamos a participar de los foros<br>
+                        y <b>¡seguir poniendo tus ideas en acción!</b>.";
         if(\Yii::$app->user->can('administrador'))
         {
             return $this->redirect(['panel/acciones']);
@@ -73,9 +77,58 @@ class PanelController extends Controller
         {
             return $this->redirect(['reporte/index']);
         }
+        else
+        {
+            $usuario=Usuario::findOne(\Yii::$app->user->id);
+            $estudiante=Estudiante::find()->where('id=:id',[':id'=>$usuario->estudiante_id])->one();
+            $integrante=Integrante::find()->where('estudiante_id=:estudiante_id',[':estudiante_id'=>$estudiante->id])->one();
+            if($integrante)
+            {
+                $equipo=Equipo::findOne($integrante->equipo_id);
+                if($equipo && $equipo->etapa==1)
+                {
+                    /*$msg="  ¡Felicitaciones!<br>
+                            Tú y tu equipo pasaron a la siguiente etapa<br>
+                            Ahora deben dar aportes a otros proyectos<br>
+                            y mejorar su proyecto<br>
+                            No te olvides de hacer tu video de la primera actividad.<br>
+                            <b>¡Sigue poniendo tus ideas en acción!</b>";*/
+                    $msg="  ¡Te felicitamos por tu participación en Ideas en acción! Tu equipo no pudo pasar a la etapa<br>
+                            final, sin embargo, a partir del 16 de julio, seguiremos orientándote para que mejores y <br>
+                            realices tu proyecto; también podrás participar en los foros.<br>
+                            <b>¡Sigue poniendo tus ideas en acción!</b>";
+                }
+                elseif($equipo && $equipo->etapa==2)
+                {
+                    $proyectoCopia=ProyectoCopia::find()->where('equipo_id=:equipo_id and etapa=2',[':equipo_id'=>$equipo->id])->one();
+                    if($proyectoCopia)
+                    {
+                    $msg="  ¡Hola! Felicitaciones por haber pasado a esta nueva etapa del concurso. Recuerda que tú y los<br>
+                            integrantes de tu equipo deben realizar tres votos para elegir a los proyectos de tu región<br>
+                            <b>¡Sigue en la ruta!</b>";
+                    }
+                    else
+                    {
+                    $msg="  ¡Te felicitamos por tu participación en Ideas en acción! Tu equipo no pudo pasar a la etapa<br>
+                            final, sin embargo, a partir del 16 de julio, seguiremos orientándote para que mejores y <br>
+                            realices tu proyecto; también podrás participar en los foros.<br>
+                            <b>¡Sigue poniendo tus ideas en acción!</b>";
+                    }
+                }
+                elseif($equipo && ($equipo->etapa==0 || $equipo->etapa==NULL))
+                {
+                    $msg="Felicitaciones por tu esfuerzo.<br>
+                        Si bien no pasaste a la siguiente etapa,<br>
+                        te invitamos a participar de los foros<br>
+                        y ¡seguir poniendo tus ideas en acción!.";
+                }
+            }
+            
+            
+        }
         
         
-        return $this->render('ideas-accion');
+        return $this->render('ideas-accion',['msg'=>$msg]);
     }
     public function actionIndex()
     {
@@ -188,7 +241,9 @@ class PanelController extends Controller
         
         $searchModel = new VotacionInternaSearch();
         $dataProvider = $searchModel->votacion(Yii::$app->request->queryParams);
-        $countInterna=VotacionInterna::find()->select(['count(proyecto_id) as maximo'])->groupBy('proyecto_id')->one();
+        $countInterna=VotacionInterna::find()->select(['count(proyecto_id) as maximo'])
+                        ->where('estado=2')
+                    ->groupBy('proyecto_id')->orderBy('maximo desc')->one();
         
         return $this->render('votacioninterna',[
                                         'searchModel' => $searchModel,

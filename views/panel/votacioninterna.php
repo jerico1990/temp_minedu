@@ -31,12 +31,6 @@ use yii\widgets\Pjax;
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
-            <div class="form-group label-floating field-votacion_interna_search-titulo required">
-                <label class="control-label" for="votacion_interna_search-titulo">Proyecto</label>
-                <input type="text" name="VotacionInternaSearch[titulo]" class="form-control" value="<?= $searchModel->titulo?>">
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <?= Html::submitButton('Buscar', ['class' => 'btn btn-raised btn-default']) ?>
             </div>
@@ -52,11 +46,18 @@ use yii\widgets\Pjax;
             //'filterModel' => $searchModel,
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-        
-                'titulo',
+                [
+                    'label'=>'Proyecto',
+                    'format'=>'raw',
+                    'value'=>function($data)
+                    {
+                        return Html::a($data->titulo,['foro/proyecto-monitor-votacion','id'=>$data->id],['target'=>'blank']);
+                    },
+                ],
+                
                 'voto',
                 [
-                    'label'=>'Valor %',
+                    'label'=>'Valor del 0-40',
                     //'attribute' => 'codigo_modular',
                     'format'=>'raw',
                     'value'=>function($data) {
@@ -70,7 +71,7 @@ use yii\widgets\Pjax;
                     'value'=>function($data) {
                         return "<div id='proyecto_".$data->id."'> ".(double)$data->resultado."</div>";
                     },
-                ],
+                ]
                 
             ],
         ]); ?>
@@ -83,11 +84,14 @@ use yii\widgets\Pjax;
 <script type="application/x-javascript">
 
 function grabado_automatico(element,proyecto_id,voto) {
+    console.log(voto);
+    console.log(<?= $countInterna->maximo ?>);
     console.log(element.val());
-    var resultado=((voto*100)/<?= $countInterna->maximo ?>)*0.7+element.val()*0.3;
-    if (element.val()<0 || element.val()>100) {
+    var resultado=((voto/<?= $countInterna->maximo ?>)*(0.7)+(element.val()/40)*(0.3))*100;
+    console.log(resultado);
+    if (element.val()<0 || element.val()>40) {
         $.notify({
-            message: 'Debe estar en el intervalo de 1 a 100' 
+            message: 'Debe estar en el intervalo de 1 a 40' 
         },{
             type: 'danger',
             z_index: 1000000,

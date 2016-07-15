@@ -50,6 +50,25 @@ class Proyecto extends \yii\db\ActiveRecord
     public $p1;
     public $p2;
     public $p3;
+    public $p4;
+    public $p5_1;
+    public $p5_2;
+    public $p5_3;
+    public $p5_4;
+    public $p5_5;
+    public $p5_6;
+    public $p5_7;
+    public $p5_8;
+    public $p6;
+    public $p7_1;
+    public $p7_2;
+    public $p7_3;
+    public $p7_4;
+    public $p7_5;
+    public $p7_6;
+    public $p7_7;
+    public $p7_8;
+    public $p8;
     public $evaluacion;
     public $forum_url;
     
@@ -92,6 +111,21 @@ class Proyecto extends \yii\db\ActiveRecord
     public $reflexion_check;
     public $archivo_proyecto_check;
     public $seccion;
+    public $total_monitor;
+    public $total_estudiante;
+    public $total_monitor_respuesta;
+    public $voto;
+    public $department_id;
+    public $valor;
+    public $department;
+    public $codigo_modular;
+    public $nombres;
+    public $apellido_paterno;
+    public $apellido_materno;
+    public $email;
+    public $celular;
+    public $grado;
+    public $descripcion_equipo;
     public static function tableName()
     {
         return 'proyecto';
@@ -110,9 +144,9 @@ class Proyecto extends \yii\db\ActiveRecord
                 'planes_presupuestales_cantidades','planes_presupuestales_subtotales','planes_presupuestal_ids',
                 'planes_presupuestales_dirigidos','planes_presupuestales_unidades','planes_presupuestales_recursos_descripciones'],'safe'],
             [['id','actividades_1','actividades_2','actividades_3','actividades_ids_1','actividades_ids_2','actividades_ids_3','cronogramas_tareas'],'safe'],
-            [['seccion','user_id','asunto_id','objetivo_especifico_1_id','objetivo_especifico_2_id','objetivo_especifico_3_id','equipo_id','region_id'], 'integer'],
+            [['seccion','user_id','asunto_id','objetivo_especifico_1_id','objetivo_especifico_2_id','objetivo_especifico_3_id','equipo_id','region_id','p4','p5_1','p5_2','p5_3','p5_4','p5_5','p5_6','p5_7','p5_8','p6','p7_1','p7_2','p7_3','p7_4','p7_5','p7_6','p7_7','p7_8','p8','total_monitor','total_estudiante','total_monitor_respuesta'], 'integer'],
             [['titulo','proyecto_archivo','proyecto_archivo2'], 'string', 'max' => 200],
-            [['ruta'], 'string', 'max' => 250],
+            [['ruta','department_id'], 'string', 'max' => 250],
             
             [['resumen','beneficiario','evaluacion'], 'string', 'max' => 25000],
             [['p1','p2','p3'], 'string', 'max' => 5000],
@@ -133,6 +167,10 @@ class Proyecto extends \yii\db\ActiveRecord
             'justificacion' => 'Justificacion',
             'objetivo_general' => 'Objetivo General',
             'user_id' => 'User ID',
+            'total_monitor'=>'# comentarios monitor',
+            'total_estudiante'=>'# comentarios de estudiantes',
+            'total_monitor_respuesta'=>'# de respuestas al monitor'
+            
         ];
     }
 
@@ -203,7 +241,7 @@ class Proyecto extends \yii\db\ActiveRecord
                         IF((SELECT COUNT(video.proyecto_id) FROM video WHERE video.proyecto_id = p.id AND TRIM( video.ruta ) IS NOT NULL and TRIM( video.ruta )!="") >=1, 1, 0 ) AS video_check,
                         IF( ( SELECT COUNT( reflexion.proyecto_id ) FROM reflexion WHERE reflexion.proyecto_id = p.id AND TRIM( reflexion.p1 ) IS NOT NULL and TRIM( reflexion.p1 )!="" AND TRIM( reflexion.p2 ) IS NOT NULL and TRIM( reflexion.p2 )!="" AND TRIM( reflexion.p3 ) IS NOT NULL and TRIM( reflexion.p3 )!="") =1, 1, 0 ) AS reflexion_check,
                         IF(trim(p.proyecto_archivo)!="",1,0) as archivo_proyecto_check,
-                        IF(e.etapa=1,1,0) as proyecto_finalizado
+                        IF(e.etapa=1 || e.etapa=2,1,0) as proyecto_finalizado
                       '])
             ->from('proyecto p')
             ->innerJoin('equipo e','e.id = p.equipo_id')
@@ -229,7 +267,7 @@ class Proyecto extends \yii\db\ActiveRecord
                         IF((SELECT COUNT(video.proyecto_id) FROM video WHERE video.proyecto_id = p.id AND TRIM( video.ruta ) IS NOT NULL and TRIM( video.ruta )!="") =1, 1, 0 ) AS video_check,
                         IF( ( SELECT COUNT( reflexion.proyecto_id ) FROM reflexion WHERE reflexion.proyecto_id = p.id AND TRIM( reflexion.p1 ) IS NOT NULL and TRIM( reflexion.p1 )!="" AND TRIM( reflexion.p2 ) IS NOT NULL and TRIM( reflexion.p2 )!="" AND TRIM( reflexion.p3 ) IS NOT NULL and TRIM( reflexion.p3 )!="") =1, 1, 0 ) AS reflexion_check,
                         IF(trim(p.proyecto_archivo)!="",1,0) as archivo_proyecto_check,
-                        IF(e.etapa=1,1,0) as proyecto_finalizado
+                        IF(e.etapa=1 || e.etapa=2,1,0) as proyecto_finalizado
                       '])
             ->from('proyecto p')
             ->innerJoin('equipo e','e.id = p.equipo_id')
@@ -237,6 +275,68 @@ class Proyecto extends \yii\db\ActiveRecord
             ->innerJoin('estudiante es','es.id=i.estudiante_id')
             ->innerJoin('institucion ins','ins.id=es.institucion_id')
             ->innerJoin('ubigeo u','u.district_id=ins.ubigeo_id')
+            ->groupBy('p.id,p.titulo')
+            ->orderBy($sort);
+        }
+        
+            
+        $result = Yii::$app->tools->Pagination($query,10);
+        
+        return ['proyectos' => $result['result'], 'pages' => $result['pages']];
+    }
+    
+    public function getProyectos2($sort,$region)
+    {
+        
+        //total_equipos province   total_alumnos  district  total_equipos_nofinalizado latitude  total_alumnos_nofinalizado longitud
+        $query = new Query;
+        if($region)
+        {
+            $query
+            ->select(['
+                        p.id,
+                        p.asunto_id,
+                        ins.denominacion,
+                        p.titulo, 
+                        COUNT( i.estudiante_id ) AS total_integrantes,
+                        IF((select count(DISTINCT integrante.estudiante_id) from foro inner join foro_comentario on foro_comentario.foro_id=foro.id  inner join usuario on usuario.id=foro_comentario.user_id inner join estudiante on estudiante.id=usuario.estudiante_id inner join integrante on integrante.estudiante_id=estudiante.id inner join equipo on equipo.id=integrante.equipo_id where foro.id=2 and estudiante.grado!=6 and p.equipo_id=equipo.id )=(COUNT( i.estudiante_id )-1),1,0) as foro_abierto,
+                        IF((select count(DISTINCT integrante.estudiante_id) from foro inner join foro_comentario on foro_comentario.foro_id=foro.id  inner join usuario on usuario.id=foro_comentario.user_id inner join estudiante on estudiante.id=usuario.estudiante_id inner join integrante on integrante.estudiante_id=estudiante.id inner join equipo on equipo.id=integrante.equipo_id where foro.asunto_id=p.asunto_id and estudiante.grado!=6 and p.equipo_id=equipo.id )=(COUNT( i.estudiante_id )-1),1,0) as foro_asunto,
+                        IF((SELECT COUNT(video.proyecto_id) FROM video WHERE video.etapa=2 and video.proyecto_id = p.id AND TRIM( video.ruta ) IS NOT NULL and TRIM( video.ruta )!="") >=1, 1, 0 ) AS video_check,
+                        IF( ( SELECT COUNT( reflexion.proyecto_id ) FROM reflexion WHERE reflexion.proyecto_id = p.id AND TRIM( reflexion.p4 ) IS NOT NULL and TRIM( reflexion.p4 )!="" AND TRIM( reflexion.p6 ) IS NOT NULL and TRIM( reflexion.p6 )!="" AND TRIM( reflexion.p8 ) IS NOT NULL and TRIM( reflexion.p8 )!="") =1, 1, 0 ) AS reflexion_check,
+                        IF(trim(p.proyecto_archivo2)!="",1,0) as archivo_proyecto_check,
+                        IF(e.etapa=2,1,0) as proyecto_finalizado
+                      '])
+            ->from('proyecto p')
+            ->innerJoin('equipo e','e.id = p.equipo_id')
+            ->innerJoin('integrante i','i.equipo_id = e.id')
+            ->innerJoin('estudiante es','es.id=i.estudiante_id')
+            ->innerJoin('institucion ins','ins.id=es.institucion_id')
+            ->innerJoin('ubigeo u','u.district_id=ins.ubigeo_id')
+            ->where('u.department_id=:department_id and e.etapa=2',[':department_id'=>$region])
+            ->groupBy('p.id,p.titulo')
+            ->orderBy($sort);
+        }
+        else
+        {
+            $query
+            ->select(['
+                        p.id,
+                        p.asunto_id,
+                        ins.denominacion,
+                        p.titulo, 
+                        COUNT( i.estudiante_id ) AS total_integrantes,
+                        IF((SELECT COUNT(video.proyecto_id) FROM video WHERE video.etapa=2 and video.proyecto_id = p.id AND TRIM( video.ruta ) IS NOT NULL and TRIM( video.ruta )!="") =1, 1, 0 ) AS video_check,
+                        IF( ( SELECT COUNT( reflexion.proyecto_id ) FROM reflexion WHERE reflexion.proyecto_id = p.id AND TRIM( reflexion.p1 ) IS NOT NULL and TRIM( reflexion.p1 )!="" AND TRIM( reflexion.p2 ) IS NOT NULL and TRIM( reflexion.p2 )!="" AND TRIM( reflexion.p3 ) IS NOT NULL and TRIM( reflexion.p3 )!="") =1, 1, 0 ) AS reflexion_check,
+                        IF(trim(p.proyecto_archivo2)!="",1,0) as archivo_proyecto_check,
+                        IF(e.etapa=2,1,0) as proyecto_finalizado
+                      '])
+            ->from('proyecto p')
+            ->innerJoin('equipo e','e.id = p.equipo_id')
+            ->innerJoin('integrante i','i.equipo_id = e.id')
+            ->innerJoin('estudiante es','es.id=i.estudiante_id')
+            ->innerJoin('institucion ins','ins.id=es.institucion_id')
+            ->innerJoin('ubigeo u','u.district_id=ins.ubigeo_id')
+            ->where('e.etapa=2')
             ->groupBy('p.id,p.titulo')
             ->orderBy($sort);
         }
@@ -291,7 +391,7 @@ class Proyecto extends \yii\db\ActiveRecord
                                     INNER JOIN estudiante es ON es.id=i.estudiante_id
                                     INNER JOIN institucion a ON a.id=es.institucion_id
                                     INNER JOIN ubigeo u ON u.district_id=a.ubigeo_id
-                                WHERE e.estado=1 AND i.rol=1 AND  i.estado=2  AND u.department_id=ubigeo.department_id AND e.etapa=1 
+                                WHERE e.estado=1 AND i.rol=1 AND  i.estado=2  AND u.department_id=ubigeo.department_id AND e.etapa in (1,2) 
                                 GROUP BY u.department_id
                             ) AS district_id
                             '])
@@ -339,7 +439,7 @@ class Proyecto extends \yii\db\ActiveRecord
                                     INNER JOIN estudiante es ON es.id=i.estudiante_id
                                     INNER JOIN institucion a ON a.id=es.institucion_id
                                     INNER JOIN ubigeo u ON u.district_id=a.ubigeo_id
-                                WHERE e.estado=1 AND i.rol=1 AND  i.estado=2  AND u.department_id=ubigeo.department_id AND e.etapa=1 
+                                WHERE e.estado=1 AND i.rol=1 AND  i.estado=2  AND u.department_id=ubigeo.department_id AND e.etapa in (1,2)
                                 GROUP BY u.department_id
                             ) AS district_id
                             '])
@@ -503,5 +603,60 @@ class Proyecto extends \yii\db\ActiveRecord
         $result = Yii::$app->tools->Pagination($query,27);
         
         return ['proyectos' => $result['result'], 'pages' => $result['pages']];
+    }
+    
+    public function getProyectoVotacion($titulo)
+    {
+        $usuario=Usuario::findOne(\Yii::$app->user->id);
+        $estudiante=Estudiante::findOne($usuario->estudiante_id);
+        $institucion=Institucion::findOne($estudiante->institucion_id);
+        $ubigeo=Ubigeo::find()->where('district_id=:district_id',[':district_id'=>$institucion->ubigeo_id])->one();
+        
+        $query = new Query;
+        if($titulo!="")
+        {
+            
+            $query->select('
+                            proyecto.id,
+                            proyecto.titulo,
+                            proyecto.resumen,
+                            equipo.descripcion_equipo,
+                            ubigeo.department,
+                            proyecto.beneficiario,
+                            proyecto.proyecto_archivo,
+                            proyecto.proyecto_archivo2
+                            ')
+                ->from('proyecto')
+                ->innerJoin('equipo','equipo.id=proyecto.equipo_id')
+                ->innerJoin('integrante','integrante.equipo_id=equipo.id')
+                ->innerJoin('estudiante','estudiante.id=integrante.estudiante_id')
+                ->innerJoin('institucion','institucion.id=estudiante.institucion_id')
+                ->innerJoin('ubigeo','ubigeo.district_id=institucion.ubigeo_id')
+                ->where('integrante.rol=1 and equipo.etapa=2 and proyecto.titulo like "%'.$titulo.'%" and ubigeo.department_id="'.$ubigeo->department_id.'"');
+            
+        }
+        else
+        {
+            $query->select('
+                            proyecto.id,
+                            proyecto.titulo,
+                            proyecto.resumen,
+                            equipo.descripcion_equipo,
+                            ubigeo.department,
+                            proyecto.beneficiario,
+                            proyecto.proyecto_archivo,
+                            proyecto.proyecto_archivo2
+                            ')
+                ->from('proyecto')
+                ->innerJoin('equipo','equipo.id=proyecto.equipo_id')
+                ->innerJoin('integrante','integrante.equipo_id=equipo.id')
+                ->innerJoin('estudiante','estudiante.id=integrante.estudiante_id')
+                ->innerJoin('institucion','institucion.id=estudiante.institucion_id')
+                ->innerJoin('ubigeo','ubigeo.district_id=institucion.ubigeo_id')
+                ->where('integrante.rol=1 and equipo.etapa=2 and ubigeo.department_id="'.$ubigeo->department_id.'"');
+        }
+        $result = Yii::$app->tools->Pagination($query,150);
+        
+        return ['votaciones' => $result['result'], 'pages' => $result['pages']];
     }
 }

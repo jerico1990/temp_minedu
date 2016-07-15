@@ -24,6 +24,8 @@ use app\models\Ubigeo;
 use app\models\VotacionPublica;
 use app\models\Estudiante;
 use app\models\Resultados;
+use app\models\Institucion;
+
 use yii\db\Query;
 use yii\web\UploadedFile;
 /**
@@ -178,11 +180,6 @@ class ProyectoController extends Controller
         $proyectoexiste=ProyectoCopia::find()->where('id=:id and etapa=1',[':id'=>$proyecto->id])->one();
         if(!$proyectoexiste)
         {
-            $proyectoetapa=Proyecto::findOne($proyecto->id);
-            $equipo=Equipo::findOne($proyectoetapa->equipo_id);
-            $equipo->etapa=1;
-            $equipo->update();
-            
             $proyectocopia =    'insert into proyecto_copia (id,titulo,resumen,objetivo_general,beneficiario,user_id,asunto_id,equipo_id,etapa,proyecto_archivo,formato_proyecto)
                                 select id,titulo,resumen,objetivo_general,beneficiario,user_id,asunto_id,equipo_id,1,proyecto_archivo,formato_proyecto from proyecto
                                 where id='.$proyecto->id.'  ';
@@ -225,13 +222,6 @@ class ProyectoController extends Controller
                                 where proyecto_id='.$proyecto->id.' and etapa=0 ';
             \Yii::$app->db->createCommand($videocopia)->execute();
             
-            $foro =    'insert into foro (titulo,descripcion,user_id,post_count,proyecto_id)
-                                select proyecto.titulo,proyecto.resumen,1,0,proyecto.id from proyecto
-                                inner join equipo on equipo.id=proyecto.equipo_id
-                                where equipo.etapa=1 and proyecto.id='.$proyecto->id.' ';
-            \Yii::$app->db->createCommand($foro)->execute();
-            
-            
             
             $usuario=Usuario::findOne(\Yii::$app->user->id);
             $integrante=Integrante::find()->where('estudiante_id=:estudiante_id',[':estudiante_id'=>$usuario->estudiante_id])->one();
@@ -251,7 +241,7 @@ class ProyectoController extends Controller
             
             $proyectoetapa=Proyecto::findOne($proyecto->id);
             $equipo=Equipo::findOne($proyectoetapa->equipo_id);
-            $equipo->etapa=1;
+            $equipo->etapa=$etapa->etapa;
             $equipo->update();
             
             echo 1;
@@ -271,8 +261,9 @@ class ProyectoController extends Controller
         $proyectoexiste=ProyectoCopia::find()->where('id=:id and etapa=2',[':id'=>$proyecto->id])->one();
         if(!$proyectoexiste)
         {
-            $proyectocopia =    'insert into proyecto_copia (id,titulo,resumen,objetivo_general,beneficiario,user_id,asunto_id,equipo_id,etapa)
-                                select id,titulo,resumen,objetivo_general,beneficiario,user_id,asunto_id,equipo_id,2 from proyecto
+            
+            $proyectocopia =    'insert into proyecto_copia (id,titulo,resumen,objetivo_general,beneficiario,user_id,asunto_id,equipo_id,etapa,proyecto_archivo,formato_proyecto,proyecto_archivo2,formato_proyecto2)
+                                select id,titulo,resumen,objetivo_general,beneficiario,user_id,asunto_id,equipo_id,2,proyecto_archivo,formato_proyecto,proyecto_archivo2,formato_proyecto2 from proyecto
                                 where id='.$proyecto->id.'  ';
             \Yii::$app->db->createCommand($proyectocopia)->execute();
             
@@ -287,11 +278,11 @@ class ProyectoController extends Controller
                                 where objetivo_especifico.proyecto_id='.$proyecto->id.' and actividad.estado=1 ';
             \Yii::$app->db->createCommand($actividadcopia)->execute();
             
-            
-            $planpresupuestalcopia =    'insert into plan_presupuestal_copia (id,actividad_id,recurso,como_conseguirlo,precio_unitario,cantidad,subtotal,estado,etapa,dirigido,recurso_descripcion,unidad)
-                                select plan_presupuestal.id,plan_presupuestal.actividad_id,plan_presupuestal.recurso,
-                                        plan_presupuestal.como_conseguirlo,plan_presupuestal.precio_unitario,plan_presupuestal.cantidad,
-                                        plan_presupuestal.subtotal,plan_presupuestal.estado,2,plan_presupuestal.dirigido,plan_presupuestal.recurso_descripcion,plan_presupuestal.unidad
+            $planpresupuestalcopia =    'insert into plan_presupuestal_copia
+                                (id,actividad_id,dirigido,recurso,recurso_descripcion,unidad,como_conseguirlo,precio_unitario,cantidad,subtotal,estado,etapa)
+                        select plan_presupuestal.id,plan_presupuestal.actividad_id,plan_presupuestal.dirigido,plan_presupuestal.recurso,
+                                plan_presupuestal.recurso_descripcion,plan_presupuestal.unidad,plan_presupuestal.como_conseguirlo,
+                                plan_presupuestal.precio_unitario,plan_presupuestal.cantidad,plan_presupuestal.subtotal,plan_presupuestal.estado,2
                                 from plan_presupuestal
                                 inner join actividad on plan_presupuestal.actividad_id=actividad.id
                                 inner join objetivo_especifico on objetivo_especifico.id=actividad.objetivo_especifico_id
@@ -307,8 +298,8 @@ class ProyectoController extends Controller
                                 where objetivo_especifico.proyecto_id='.$proyecto->id.' and cronograma.estado=1 ';
             \Yii::$app->db->createCommand($cronogramacopia)->execute();
             
-            $videocopia =    'insert into video_copia (id,proyecto_id,ruta,etapa)
-                                select id,proyecto_id,ruta,2 from video
+            $videocopia =    'insert into video_copia (id,proyecto_id,ruta,etapa,tipo)
+                                select id,proyecto_id,ruta,2,tipo from video
                                 where proyecto_id='.$proyecto->id.' and etapa=0';
             \Yii::$app->db->createCommand($videocopia)->execute();
             
@@ -321,7 +312,7 @@ class ProyectoController extends Controller
             $video->update();
             $proyectoetapa=Proyecto::findOne($proyecto->id);
             $equipo=Equipo::findOne($proyectoetapa->equipo_id);
-            $equipo->etapa=$etapa->etapa;
+            $equipo->etapa=2;
             $equipo->update();
             
             echo 1;
@@ -361,7 +352,6 @@ class ProyectoController extends Controller
         $etapa=Etapa::find()->where('estado=1 and etapa=1')->one();
         if($proyectoexiste && $etapa)
         {
-            
             $foros = 'insert into foro (titulo,descripcion,user_id,post_count,proyecto_id)
                     select proyecto.titulo,proyecto.resumen,1,0,proyecto.id from proyecto
                     inner join equipo on equipo.id=proyecto.equipo_id
@@ -457,14 +447,28 @@ class ProyectoController extends Controller
     public function actionVotacion()
     {
         $this->layout='estandar';
+        $model=new Proyecto;
         $searchModel = new ProyectoSearch();
         $dataProvider = $searchModel->votacion(Yii::$app->request->queryParams);
         $votacionesinternas=VotacionInterna::find()
                             ->where('user_id=:user_id and estado in (1,2)',
                                     [':user_id'=>\Yii::$app->user->id])
                             ->all();
-                            
-                            
+        $usuario=Usuario::findOne(\Yii::$app->user->id);
+        $estudiante=Estudiante::findOne($usuario->estudiante_id);
+        $institucion=Institucion::findOne($estudiante->institucion_id);
+        $ubigeo=Ubigeo::find()->where('district_id=:district_id',[':district_id'=>$institucion->ubigeo_id])->one();
+        
+        $regionCount=Equipo::find()
+                        ->innerJoin('proyecto','proyecto.equipo_id=equipo.id')
+                        ->innerJoin('integrante','integrante.equipo_id=equipo.id')
+                        ->innerJoin('estudiante','estudiante.id=integrante.estudiante_id')
+                        ->innerJoin('institucion','institucion.id=estudiante.institucion_id')
+                        ->innerJoin('ubigeo','ubigeo.district_id=institucion.ubigeo_id')
+                        ->where('integrante.rol=1 and equipo.etapa=2 and ubigeo.department_id=:department_id',[':department_id'=>$ubigeo->department_id])
+                        ->count();
+         
+        
         $votacionesinternasCount=VotacionInterna::find()
                             ->where('user_id=:user_id and estado=1',
                                     [':user_id'=>\Yii::$app->user->id])
@@ -475,15 +479,58 @@ class ProyectoController extends Controller
                             ->count();                    
         $votacion_publica=VotacionPublica::find()->all();                    
         return $this->render('votacion',[
+                                        'model'=>$model,
                                         'searchModel' => $searchModel,
                                         'dataProvider' => $dataProvider,
                                         'votacionesinternas'=>$votacionesinternas,
                                         'votacionesinternasCount'=>$votacionesinternasCount,
                                         'votacionesinternasfinalizadasCount'=>$votacionesinternasfinalizadasCount,
-                                        'votacion_publica'=>$votacion_publica]);
+                                        'votacion_publica'=>$votacion_publica,
+                                        'regionCount'=>$regionCount]);
     }
     
     public function actionVotacioninterna($id)
+    {
+        $proyecto=Proyecto::findOne($id);
+        $votacioninterna=VotacionInterna::find()
+                            ->where('proyecto_id=:proyecto_id and user_id=:user_id and estado=1',
+                                    [':proyecto_id'=>$proyecto->id,':user_id'=>\Yii::$app->user->id])
+                            ->one();
+        
+        $countvotacioninterna=VotacionInterna::find()
+                            ->where( 'user_id=:user_id',
+                                    [':user_id'=>\Yii::$app->user->id])
+                            ->count();
+                            
+        if($countvotacioninterna<3 || $votacioninterna)
+        {
+            if(!$votacioninterna)
+            {
+                $votacioninterna=new VotacionInterna;
+                $votacioninterna->proyecto_id=$proyecto->id;
+                $votacioninterna->region_id=$proyecto->region_id;
+                $votacioninterna->user_id=\Yii::$app->user->id;
+                $votacioninterna->estado=1;
+                $votacioninterna->save();
+                echo 1;
+            }/*
+            else
+            {
+                VotacionInterna::find()
+                                ->where('proyecto_id=:proyecto_id and user_id=:user_id and estado=1',
+                                        [':proyecto_id'=>$proyecto->id,':user_id'=>\Yii::$app->user->id])
+                                ->one()
+                                ->delete();
+                echo 2;
+            }*/
+        }
+        else
+        {
+            echo 3;
+        }
+    }
+    
+    public function actionVotacioninternaeliminar($id)
     {
         $proyecto=Proyecto::findOne($id);
         $votacioninterna=VotacionInterna::find()
@@ -522,8 +569,6 @@ class ProyectoController extends Controller
         {
             echo 3;
         }
-        
-        
     }
     
     public function actionFinalizarvotacioninterna()
@@ -626,7 +671,7 @@ class ProyectoController extends Controller
         $proyecto->archivo2 = UploadedFile::getInstance($proyecto, 'archivo2');
         if($proyecto->archivo2) {
             
-            $proyecto->proyecto_archivo2=$proyecto->id. '.' . $proyecto->archivo2->extension;
+            $proyecto->proyecto_archivo2=$proyecto->id. '_2.' . $proyecto->archivo2->extension;
             $proyecto->formato_proyecto2=1;//formato en documento
             $proyecto->update();
             $proyecto->archivo2->saveAs('proyectos/' . $proyecto->proyecto_archivo2);
@@ -635,6 +680,17 @@ class ProyectoController extends Controller
         exit;
     }
     
-    
+    public function actionEliminarArchivo2()
+    {
+        if(isset($_POST["id"]))
+        {
+            $id=$_POST["id"];
+            $proyecto=Proyecto::findOne($id);
+            $proyecto->proyecto_archivo2=NULL;
+            $proyecto->formato_proyecto2=NULL;
+            $proyecto->update();
+        }
+        
+    }
     
 }

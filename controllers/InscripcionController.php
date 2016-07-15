@@ -67,7 +67,7 @@ class InscripcionController extends Controller
                             not in (select integrante.estudiante_id from integrante
                                     inner join estudiante on estudiante.id=integrante.estudiante_id
                                     where estudiante.grado!=6)
-                            and estudiante.id!=:id and estudiante.id not in (select estudiante_id from integrante)
+                            and estudiante.id!=:id and estudiante.id not in (selecte estudiante_id from integrante)
                             ',[':institucion_id'=>$institucion->id,':id'=>$institucion->estudiante_id])
                     ->orderBy('grado asc')->all();
         
@@ -129,22 +129,12 @@ class InscripcionController extends Controller
                     ->where('integrante.estudiante_id=:estudiante_id',[':estudiante_id'=>$equipo->invitaciones[$i]])->one();
                     if(!$integrante)
                     {
-                        Invitacion::updateAll(['estado' => 0], 'estado = 1 and estudiante_invitado_id=:estudiante_invitado_id',
-                              [':estudiante_invitado_id'=>$equipo->invitaciones[$i]]);
-                        
                         $invitacion->estudiante_id=$institucion->estudiante_id;
                         $invitacion->equipo_id=$equipo->id;
                         $invitacion->estudiante_invitado_id=$equipo->invitaciones[$i];
-                        $invitacion->estado=2;
+                        $invitacion->estado=1;
                         $invitacion->fecha_invitacion=date("Y-m-d H:i:s");
                         $invitacion->save();
-                        
-                        $integrante_new=new Integrante();
-                        $integrante_new->equipo_id=$equipo->id;
-                        $integrante_new->estudiante_id=$equipo->invitaciones[$i];
-                        $integrante_new->rol=2;
-                        $integrante_new->estado=1;
-                        $integrante_new->save();
                     }
                 }
             }
@@ -161,22 +151,12 @@ class InscripcionController extends Controller
                     ->where('integrante.estudiante_id=:estudiante_id',[':estudiante_id'=>$equipo->invitaciones[$i]])->one();
                     if(!$integrante)
                     {
-                        Invitacion::updateAll(['estado' => 0], 'estado = 1 and estudiante_invitado_id=:estudiante_invitado_id',
-                              [':estudiante_invitado_id'=>$equipo->invitaciones_docente[$i]]);
-                        
                         $invitacion->estudiante_id=$institucion->estudiante_id;
                         $invitacion->equipo_id=$equipo->id;
                         $invitacion->estudiante_invitado_id=$equipo->invitaciones_docente[$i];
-                        $invitacion->estado=2;
+                        $invitacion->estado=1;
                         $invitacion->fecha_invitacion=date("Y-m-d H:i:s");
                         $invitacion->save();
-                        
-                        $integrante_new=new Integrante();
-                        $integrante_new->equipo_id=$equipo->id;
-                        $integrante_new->estudiante_id=$equipo->invitaciones_docente[$i];
-                        $integrante_new->rol=2;
-                        $integrante_new->estado=1;
-                        $integrante_new->save();
                     }
                 }
             }
@@ -239,9 +219,9 @@ class InscripcionController extends Controller
                             not in (select invitacion.estudiante_invitado_id from invitacion
                                     inner join estudiante on estudiante.id=invitacion.estudiante_invitado_id
                                     where invitacion.equipo_id='.$equipo->id.' and invitacion.estado=1 and estudiante.grado!=6)
-                            and estudiante.id
+                            and estudiante.id 
                             not in (select estudiante_id from integrante where equipo_id='.$equipo->id.') and estudiante.id!=:id
-                            and estudiante.id not in (select estudiante_id from integrante)
+                            and estudiante.id not in (selecte estudiante_id from integrante)
                             ',[':institucion_id'=>$institucion->id,':id'=>$institucion->estudiante_id])
                     ->orderBy('grado asc')->all();
                     
@@ -298,23 +278,13 @@ class InscripcionController extends Controller
                 $countInvitaciones=count($equipo->invitaciones);
                 for($i=0;$i<$countInvitaciones;$i++)
                 {
-                    Invitacion::updateAll(['estado' => 0], 'estado = 1 and estudiante_invitado_id=:estudiante_invitado_id',
-                              [':estudiante_invitado_id'=>$equipo->invitaciones[$i]]);
-                    
                     $invitacion=new Invitacion;
                     $invitacion->estudiante_id=$institucion->estudiante_id;
                     $invitacion->equipo_id=$equipo->id;
                     $invitacion->estudiante_invitado_id=$equipo->invitaciones[$i];
-                    $invitacion->estado=2;
+                    $invitacion->estado=1;
                     $invitacion->fecha_invitacion=date("Y-m-d H:i:s");
                     $invitacion->save();
-                    
-                    $integrante_new=new Integrante();
-                    $integrante_new->equipo_id=$equipo->id;
-                    $integrante_new->estudiante_id=$equipo->invitaciones[$i];
-                    $integrante_new->rol=2;
-                    $integrante_new->estado=1;
-                    $integrante_new->save();
                 }
             }
             
@@ -323,23 +293,13 @@ class InscripcionController extends Controller
                 $countInvitaciones=count($equipo->invitaciones_docente);
                 for($i=0;$i<$countInvitaciones;$i++)
                 {
-                    Invitacion::updateAll(['estado' => 0], 'estado = 1 and estudiante_invitado_id=:estudiante_invitado_id',
-                              [':estudiante_invitado_id'=>$equipo->invitaciones_docente[$i]]);
-                    
                     $invitacion=new Invitacion;
                     $invitacion->estudiante_id=$institucion->estudiante_id;
                     $invitacion->equipo_id=$equipo->id;
                     $invitacion->estudiante_invitado_id=$equipo->invitaciones_docente[$i];
-                    $invitacion->estado=2;
+                    $invitacion->estado=1;
                     $invitacion->fecha_invitacion=date("Y-m-d H:i:s");
                     $invitacion->save();
-                    
-                    $integrante_new=new Integrante();
-                    $integrante_new->equipo_id=$equipo->id;
-                    $integrante_new->estudiante_id=$equipo->invitaciones_docente[$i];
-                    $integrante_new->rol=2;
-                    $integrante_new->estado=1;
-                    $integrante_new->save();
                 }
             }
             

@@ -14,10 +14,10 @@ $this->title="Ideas en acción";
 ?>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
-<?php //if($equipo->etapa==1 || $equipo->etapa==2){?>
+<?php if($equipo->etapa==1 || $equipo->etapa==2){?>
 <?= \app\widgets\proyecto\ProyectoPrimeraEntregaWidget::widget(); ?>
 <?php //= \app\widgets\proyecto\ProyectoPrimeraEntregaWidget::widget(); ?>
-<?php //}?>
+<?php }?>
 
 <?php if($equipo->etapa==2){?>
 <?= \app\widgets\proyecto\ProyectoSegundaEntregaWidget::widget(); ?>

@@ -52,12 +52,17 @@ use yii\web\JsExpression;
 }
 </style>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<?php if($etapa2 && $equipo->etapa==0){ ?>
-<button class="btn btn-default" type="button" id="btnprimeraentrega" >Finalizar 1ra entrega</button>
+<?php if($etapa1 && $equipo->etapa==0){ ?>
+<button class="btn btn-default" type="button" id="btnprimeraentrega" <?= (!$etapa1 || $equipo->etapa==1)?'disabled':'' ?>>Finalizar 1ra entrega</button>
 <?php }?>
 <?php if($etapa2 && $equipo->etapa==1){ ?>
-<button class="btn btn-default" type="button" id="btnsegundaentrega" <?= (!$etapa2 || $equipo->etapa==2)?'disabled':'' ?>>Cerrar segunda entrega</button>
-<?php }?>
+<button class="btn btn-default" type="button" id="btnsegundaentrega" <?= (!$etapa2 || $equipo->etapa==2)?'disabled':'' ?>>Finalizar 2da entrega</button>
+<?php } ?>
+<?php /*if($equipo->etapa==1){ ?>
+<button class="btn btn-default" type="button" id="btnsegundaentrega" >Finalizar 2da entrega</button>
+<?php }*/ ?>
+
+
 
 <?php if($equipo->etapa==1 || $equipo->etapa==2){?>
 <?php //= \app\widgets\proyecto\ProyectoPrimeraEntregaWidget::widget(); ?>
@@ -158,17 +163,18 @@ use yii\web\JsExpression;
     
     $('#btnsegundaentrega').click(function(event){
         var error='';
-        var evaluacion='<?= $errorevaluacion ?>';
-        var recomendacion='<?= $errorrecomendaciones ?>';
+        //var evaluacion='<?= $errorevaluacion ?>';
+       // var recomendacion='<?= $errorrecomendaciones ?>';
         var video=<?= $videosegunda ?>;
         
         
-        if (evaluacion!='') {
+        /*if (evaluacion!='') {
             error=evaluacion+error;
-        }
+        }*/
+        /*
         if (recomendacion!='') {
             error=recomendacion+error;
-        }
+        }*/
         if (video<1) {
             error='Debe ingresar el video de la Segunda etapa del proyecto <br>'+error;
         }

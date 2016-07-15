@@ -71,7 +71,9 @@ use yii\widgets\Pjax;
         ['class' => 'yii\grid\SerialColumn'],
 
         'titulo',
-        
+        'total_monitor',
+        'total_estudiante',
+        'total_monitor_respuesta',
 
         [
             'class' => 'yii\grid\ActionColumn',

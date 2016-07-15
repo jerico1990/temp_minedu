@@ -85,9 +85,9 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
     ]); ?>
     <div class="md-col-6">
         <div class="form-group label-floating field-voto-region">
-            <label>Sección (Selecciona una sección para comentar el proyecto)</label>
-            <select id="proyecto-seccion" name="Proyecto[seccion]" class="form-control" >
-                <option value></option>
+            <label>Sección </label>
+            <select style="border: 2px solid #1f2a69;padding: 10px;margin-top: 10px;margin-bottom: 3px;background: #F0EFF1" id="proyecto-seccion" name="Proyecto[seccion]" class="form-control" >
+                <option value>Selecciona una sección para comentar el proyecto</option>
                 <option value="1" <?= ($seccion==1)?'selected':'' ?>>Nombre del proyecto</option>
                 <option value="2" <?= ($seccion==2)?'selected':'' ?>>Resumen del proyecto</option>
                 <option value="3" <?= ($seccion==3)?'selected':'' ?>>Beneficiarios</option>
@@ -118,6 +118,7 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
         ]); */
     ?>
     <div class="clearfix"></div>
+    
     <div class="form-group label-floating">
         <label class="control-label " for="foro_comentario-contenido" style="padding-left: 10px"> Ingrese comentario</label>
         <textarea style="border: 2px solid #1f2a69;padding: 10px;margin-top: 10px;margin-bottom: 3px;background: #F0EFF1" id="foro_comentario-contenido" name="ForoComentario[contenido]" class="textarea form-control" style="width: 100%; height: 80px; font-size: 14px; line-height: 18px; padding: 10px; " ></textarea>
@@ -125,8 +126,7 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
     <div class="col-md-4 text-center">
         <button type="submit" id="btncomentar" class="btn btn-raised btn-default">Comentar</button>
     </div>
-   
-   
+    
    
 <div class="popup" id="faltan_datos">
 	<div class="popup_content">
@@ -143,7 +143,6 @@ $posts = $model->getForo1Entrega($model->id,$seccion);
 		</form>
 	</div>
 </div>
-
 
 <?php
     $comentarios= Yii::$app->getUrlManager()->createUrl('foro-comentario/comentario');

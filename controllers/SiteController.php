@@ -56,7 +56,11 @@ class SiteController extends Controller
     {
         return $this->redirect(['site/votacion']);
     }
-
+    public function actionBases()
+    {
+        $this->layout='minedu';
+        return $this->render('bases');
+    }
     public function actionLogin()
     {
         $this->layout='login';
@@ -76,6 +80,7 @@ class SiteController extends Controller
             $log->user_id=\Yii::$app->user->id;
             $log->hora_logeo=date("Y-m-d H:i:s");
             $log->save();
+            Yii::$app->session->setFlash('lightbox');
             return $this->redirect(['panel/ideas-accion']);
         }
         return $this->render('login', [
@@ -181,4 +186,6 @@ class SiteController extends Controller
         $this->layout='prueba';
         return $this->render('error');
     }
+    
+    
 }
