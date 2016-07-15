@@ -88,8 +88,8 @@ label{
                 <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="false" style="color: #333 !important">Datos generales</a></li>
                 <li class=""><a href="#tab_9" data-toggle="tab" aria-expanded="true" style="color: #333 !important">Objetivos y actividades</a></li>
                 <!--<li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="true" style="color: #333 !important">Resultado</a></li>-->
-                <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="true" style="color: #333 !important">Presupuesto</a></li>
-                <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false" style="color: #333 !important">Cronograma</a></li>
+                <!--<li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="true" style="color: #333 !important">Presupuesto</a></li>
+                <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false" style="color: #333 !important">Cronograma</a></li>-->
                 <!--<li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false"  style="color: #333 !important">Mi video</a></li>-->
                 <?php if($equipo->etapa==1 && $estudiante->grado!=6){?>
                 <!--<li class=""><a href="#tab_6" data-toggle="tab" aria-expanded="false" style="color: #333 !important" >Reflexión</a></li>-->
